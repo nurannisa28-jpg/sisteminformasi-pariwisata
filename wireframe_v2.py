@@ -206,4 +206,4 @@ elif menu == "🎫 Reservasi Online":
 
 # FOOTER
 st.markdown("---")
-st.markdown("<p style='text-align:center; color:#94a3b8;'>© 2026 Nusantara Hub Digital Service - Developed by Nur Annisa Bangka.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:#94a3b8;'>© 2026 Nusantara Hub Digital Service - Developed by Kelompok 4 Pariwisata - Prototyping.</p>", unsafe_allow_html=True)
