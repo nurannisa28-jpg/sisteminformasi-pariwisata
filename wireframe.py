@@ -19,7 +19,7 @@ st.markdown("""
 
 # 3. SIDEBAR
 with st.sidebar:
-    st.markdown("<h2 style='color: #fbbf24;'>SISTEM PUSAT</h2>", unsafe_allow_index=True)
+    st.markdown("<h2 style='color: #fbbf24;'>SISTEM PUSAT</h2>", unsafe_allow_html=True)
     menu = st.radio("Navigasi:", ["🌐 Portal Utama", "📊 Dashboard", "🎫 Reservasi"])
 
 # 4. DATA SIMULASI (Agar Link Publik Tetap Jalan Tanpa XAMPP)
