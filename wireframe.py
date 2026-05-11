@@ -15,7 +15,7 @@ st.markdown("""
         color: #000000; font-weight: bold; border-radius: 8px;
     }
     </style>
-    """, unsafe_allow_index=True)
+    """, unsafe_allow_html=True)
 
 # 3. SIDEBAR
 with st.sidebar:
