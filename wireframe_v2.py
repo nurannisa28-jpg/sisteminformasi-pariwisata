@@ -89,3 +89,7 @@ if menu == "💎 Beranda Eksklusif":
     # Hero Section
     st.title("Jelajahi Kemurnian Nusantara")
     st.markdown("####
+
+# FOOTER
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: #64748b;'>© 2024 Wonderful Indonesia Digital Division. All Rights Reserved.</p>", unsafe_allow_html=True)
