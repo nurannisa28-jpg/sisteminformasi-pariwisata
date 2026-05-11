@@ -99,75 +99,82 @@ wisata_data = [
 ]
 df = pd.DataFrame(wisata_data)
 
-# 4. SIDEBAR UNIVERSAL BRANDING
+# 4. SIDEBAR
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/b/bb/Wonderful_Indonesia_logo.svg", width=180)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/b/bb/Wonderful_Indonesia_logo.svg", width=150)
+    st.title("Menu Utama")
+    menu = st.radio("Navigasi:", ["🏠 Beranda", "🗺️ Peta Wisata (GIS)", "🛒 Reservasi Tiket"])
     st.markdown("---")
-    st.markdown("### **USER PORTAL**")
-    st.markdown("""
-        <div style="background:#f1f5f9; padding:15px; border-radius:12px; border: 1px solid #e2e8f0;">
-            <p style="margin:0; font-weight:700;">👤 Guest Traveller</p>
-            <p style="margin:0; font-size:0.8rem; color:#64748b;">Session Status: Active</p>
-        </div>
-    """, unsafe_allow_html=True)
-    st.markdown("---")
-    menu = st.radio("Navigation:", ["🏠 Beranda Nasional", "🗺️ Peta Lokasi (GIS)", "🗂️ Direktori 38 Provinsi"])
-    st.info(f"Database: {len(df)} Provinces")
+    st.write("👤 **Status: Pelanggan Terdaftar**")
 
-# 5. LOGIKA HALAMAN
-if menu == "🏠 Beranda Nasional":
-    st.title("Digital Tourism Gateway Indonesia")
-    st.markdown("#### *Satu Pintu Menuju Pesona 38 Provinsi Nusantara*")
-    st.image("https://images.unsplash.com/photo-1505993597083-3bd19fb75e57?w=1400", use_container_width=True)
-    
-    st.markdown("---")
-    c1, c2, c3 = st.columns(3)
-    with c1: st.markdown('<div class="travel-card"><div class="card-content"><h3>38 Provinsi</h3><p>Data lengkap sesuai pemekaran wilayah terbaru.</p></div></div>', unsafe_allow_html=True)
-    with c2: st.markdown('<div class="travel-card"><div class="card-content"><h3>6 Kategori Wisata</h3><p>Alam, Bahari, Budaya, Religi, Sejarah, Modern.</p></div></div>', unsafe_allow_html=True)
-    with c3: st.markdown('<div class="travel-card"><div class="card-content"><h3>Verified Maps</h3><p>Koordinat GIS presisi untuk setiap destinasi.</p></div></div>', unsafe_allow_html=True)
+# 5. HALAMAN BERANDA
+if menu == "🏠 Beranda":
+    st.title("Portal Pariwisata Digital Indonesia")
+    st.image("https://images.unsplash.com/photo-1505993597083-3bd19fb75e57?w=1200", use_container_width=True)
+    st.write("Selamat datang di sistem informasi pariwisata terpadu 38 Provinsi Nusantara.")
 
-elif menu == "🗺️ Peta Lokasi (GIS)":
-    st.header("Sistem Informasi Geografis Destinasi")
-    st.write("Arahkan kursor ke titik untuk melihat detail destinasi di tiap provinsi.")
-    
-    fig = px.scatter_mapbox(df, lat="lat", lon="lon", hover_name="nama", hover_data=["prov", "kat"],
-                            color="kat", zoom=3.8, height=650)
+# 6. HALAMAN PETA
+elif menu == "🗺️ Peta Wisata (GIS)":
+    st.title("Pemetaan Lokasi Destinasi")
+    fig = px.scatter_mapbox(df, lat="lat", lon="lon", hover_name="nama", hover_data=["prov", "harga"],
+                            color="kat", zoom=3, height=600)
     fig.update_layout(mapbox_style="open-street-map", margin={"r":0,"t":0,"l":0,"b":0})
     st.plotly_chart(fig, use_container_width=True)
 
-elif menu == "🗂️ Direktori 38 Provinsi":
-    st.header("Direktori Destinasi Nasional")
+# 7. HALAMAN RESERVASI & PEMBAYARAN (FITUR YANG KAMU MINTA)
+elif menu == "🛒 Reservasi Tiket":
+    st.title("Formulir Reservasi & Pembayaran")
     
-    # Global Filter
-    search = st.text_input("🔍 Cari destinasi atau provinsi...")
-    kat_pilihan = st.multiselect("Saring Kategori:", df["kat"].unique(), default=df["kat"].unique())
+    col1, col2 = st.columns([1, 1])
     
-    filtered_df = df[df["kat"].isin(kat_pilihan)]
-    if search:
-        filtered_df = filtered_df[filtered_df["nama"].str.contains(search, case=False) | filtered_df["prov"].str.contains(search, case=False)]
-    
-    st.write(f"Menampilkan **{len(filtered_df)}** Lokasi Terverifikasi")
-    
-    # GRID DISPLAY
-    cols = st.columns(3)
-    for i, row in filtered_df.reset_index().iterrows():
-        with cols[i % 3]:
-            st.markdown(f'''
-                <div class="travel-card">
-                    <img src="{row['img']}" style="width:100%; height:200px; object-fit:cover;">
-                    <div class="card-content">
-                        <span style="background:#0284c7; color:white; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:600;">{row['kat']}</span>
-                        <h3 style="margin:10px 0 5px 0; font-size:1.2rem;">{row['nama']}</h3>
-                        <p style="color:#64748b; font-size:0.9rem; margin-bottom:10px;">📍 {row['prov']}</p>
-                    </div>
+    with col1:
+        st.subheader("1. Pilih Destinasi")
+        pilih_wisata = st.selectbox("Pilih Objek Wisata:", df["nama"].tolist())
+        data_pilih = df[df["nama"] == pilih_wisata].iloc[0]
+        
+        st.markdown(f"""
+            <div class="travel-card">
+                <img src="{data_pilih['img']}" style="width:100%; height:200px; object-fit:cover;">
+                <div class="card-content">
+                    <h4>{data_pilih['nama']}</h4>
+                    <p>📍 {data_pilih['prov']}</p>
+                    <p class="price-text">Harga: Rp {data_pilih['harga']:,} / orang</p>
                 </div>
-            ''', unsafe_allow_html=True)
-            with st.expander(f"Informasi Detail {row['nama']}"):
-                st.write(f"Destinasi ini merupakan ikon wisata kategori **{row['kat']}** di Provinsi **{row['prov']}**.")
-                st.write("Fasilitas: Pusat Informasi, Toilet Umum, Area Parkir, Spot Foto.")
-                if st.button(f"Ajukan Reservasi: {row['nama']}", key=row['nama']):
-                    st.success(f"Permintaan Anda untuk {row['nama']} sedang diproses.")
+            </div>
+        """, unsafe_allow_html=True)
 
-# FOOTER
+    with col2:
+        st.subheader("2. Detail Pengunjung")
+        nama = st.text_input("Nama Lengkap")
+        tgl = st.date_input("Tanggal Kunjungan", datetime.date.today())
+        jumlah = st.number_input("Jumlah Tiket", min_value=1, value=1)
+        total = data_pilih['harga'] * jumlah
+        
+        st.write(f"### Total Bayar: **Rp {total:,}**")
+        
+        metode = st.radio("Metode Pembayaran:", ["OVO / Dana", "QRIS", "Transfer Bank"])
+        
+        if st.button("Konfirmasi & Bayar Sekarang"):
+            if nama == "":
+                st.error("Silakan isi nama Anda terlebih dahulu!")
+            else:
+                st.success("Pembayaran Berhasil! Tiket Anda telah diterbitkan.")
+                
+                # SIMULASI QR CODE & TIKET
+                st.markdown("---")
+                st.subheader("🎫 E-TICKET ANDA")
+                c_a, c_b = st.columns([1, 2])
+                with c_a:
+                    # Menggunakan API eksternal untuk generate QR Code secara real-time
+                    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TIKET-{nama}-{pilih_wisata}"
+                    st.image(qr_url, caption="Scan saat tiba di lokasi")
+                with c_b:
+                    st.write(f"**Nama:** {nama}")
+                    st.write(f"**Destinasi:** {pilih_wisata} ({data_pilih['prov']})")
+                    st.write(f"**Tanggal:** {tgl}")
+                    st.write(f"**Jumlah:** {jumlah} Tiket")
+                    st.write(f"**Status:** LUNAS ✅")
+                st.button("Download PDF Tiket")
+
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #64748b;'>© 2026 Portal Pariwisata Digital Indonesia. Dibuat oleh Nur Annisa - UNJANI.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>© 2026 Sistem Informasi Pariwisata UNJANI - Kelompok 4 Sektor Pariwisata-prototyping</p>", unsafe_allow_html=True)
