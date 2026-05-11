@@ -77,4 +77,10 @@ elif menu == "💰 Cek Biaya":
     
     with st.container():
         nama = st.text_input("Masukkan Nama Anda")
-        tujuan = st.selectbox("Pilih Tujuan
+        tujuan = st.selectbox("Pilih Tujuan Wisata", df["Destinasi"])
+        jumlah = st.number_input("Jumlah Tiket", min_value=1, step=1)
+        
+        if st.button("Hitung Sekarang"):
+            harga_satuan = df[df["Destinasi"] == tujuan]["Harga"].values[0]
+            total = harga_satuan * jumlah
+            st.success(f"Halo {nama}, total biaya tiket ke {tujuan} adalah: Rp {total:,}")
