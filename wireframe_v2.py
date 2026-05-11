@@ -2,218 +2,125 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ==========================================
-# 1. KONFIGURASI HALAMAN & TEMA ELITE
-# ==========================================
-st.set_page_config(
-    page_title="Nusantara Elite Travel | Wonderful Indonesia", 
-    page_icon="🗺️", 
-    layout="wide", 
-    initial_sidebar_state="expanded"
-)
+# 1. KONFIGURASI HALAMAN GACOR
+st.set_page_config(page_title="Nusantara Elite Travel | Wonderful Indonesia", page_icon="💎", layout="wide")
 
-# 2. CSS CUSTOM: MEWAH, JELAS, & CORPORATE STYLE
+# 2. CSS CUSTOM UNTUK TAMPILAN ELITE & HURUF JELAS
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
     
-    /* Font Dasar: Inter (Sangat Jelas & Modern) */
-    html, body, [class*="css"] { 
-        font-family: 'Inter', sans-serif; 
-        color: #1e293b;
+    html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    /* Background & Card Mewah */
+    .stApp { background-color: #f0f4f8; }
+    
+    .main-card {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
     }
     
-    /* Font Judul: Playfair Display (Mewah & Klasik) */
-    h1, h2, .luxury-header { 
-        font-family: 'Playfair Display', serif; 
-        font-weight: 700; 
-        color: #0f172a !important; 
-        margin-top: 0px;
-    }
-    h1 { font-size: 3.5rem !important; }
-    h2 { font-size: 2.2rem !important; color: #0284c7 !important; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-    h3 { font-size: 1.5rem !important; font-weight: 600; color: #0f172a; }
-
-    .stApp { background-color: #f8fafc; }
+    /* Judul Gacor */
+    h1 { color: #0f172a; font-weight: 800; font-size: 3.5rem !important; margin-bottom: 10px; }
+    h2 { color: #0284c7; font-weight: 700; border-left: 6px solid #0284c7; padding-left: 15px; }
     
-    /* Container untuk Foto (Agar Rapi & Tidak Pecah) */
-    .img-container {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin-bottom: 15px;
+    /* Button & Interaction */
+    div.stButton > button:first-child {
+        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+        color: white; border: none; padding: 12px 35px;
+        border-radius: 12px; font-weight: 700; width: 100%; transition: 0.3s;
     }
-
-    /* Card Styling */
-    .stExpander {
-        background-color: white;
-        border-radius: 12px !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        margin-bottom: 15px;
-    }
-    
-    /* Label Sidebar */
-    .css-1d391kg { font-size: 1.1rem; font-weight: 600; color: #0f172a !important; }
-    
-    /* Custom Footer */
-    .footer {
-        text-align: center;
-        padding: 30px 0;
-        color: #64748b;
-        font-size: 0.9rem;
-        border-top: 1px solid #e2e8f0;
-        margin-top: 50px;
-    }
+    div.stButton > button:first-child:hover { transform: scale(1.02); box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3); }
     </style>
     """, unsafe_allow_html=True)
 
-# ==========================================
-# 3. DATABASE DESTINASI SUPER SEMPURNA
-# ==========================================
-# Menggunakan link source.unsplash.com yang sangat stabil
-destinasi_data = [
-    {
-        "id": "raja_ampat",
-        "nama": "Raja Ampat",
-        "provinsi": "Papua Barat",
-        "tagline": "The Last Paradise on Earth",
-        "desc": "Rumah bagi 75% spesies karang dunia. Pusat keanekaragaman hayati laut global di Segitiga Karang.",
-        "images": [
-            "https://source.unsplash.com/800x600/?ocean,indonesia",
-            "https://source.unsplash.com/800x600/?coral,rajaampat"
-        ],
-        "kategori": "Bahari & Selam",
-        "rating": "5.0 ★",
-        "cost": "High-End"
-    },
-    {
-        "id": "komodo",
-        "nama": "Pulau Komodo",
-        "provinsi": "NTT",
-        "tagline": "Home of the Ancient Dragons",
-        "desc": "Hanya di sini reptil purba terbesar di dunia hidup bebas di habitat aslinya. Nikmati keindahan Pantai Pink yang menawan.",
-        "images": [
-            "https://source.unsplash.com/800x600/?komododragon,island",
-            "https://source.unsplash.com/800x600/?pinkbeach,indonesia"
-        ],
-        "kategori": "Konservasi & Alam",
-        "rating": "4.9 ★",
-        "cost": "Moderate-High"
-    },
-    {
-        "id": "borobudur",
-        "nama": "Candi Borobudur",
-        "provinsi": "Jawa Tengah",
-        "tagline": "The World's Largest Buddhist Temple",
-        "desc": "Karya agung arsitektur abad ke-9, warisan dunia UNESCO yang memancarkan spiritualitas dan sejarah luhur.",
-        "images": [
-            "https://source.unsplash.com/800x600/?borobudur,temple",
-            "https://source.unsplash.com/800x600/?sunrise,indonesia"
-        ],
-        "kategori": "Sejarah & Budaya",
-        "rating": "4.8 ★",
-        "cost": "Moderate"
-    }
+# 3. DATABASE 20+ DESTINASI (STABIL & LENGKAP)
+destinasi = [
+    {"nama": "Raja Ampat", "loc": "Papua Barat", "kat": "Bahari", "img": "https://images.pexels.com/photos/3405151/pexels-photo-3405151.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Pulau Komodo", "loc": "NTT", "kat": "Alam", "img": "https://images.pexels.com/photos/11559868/pexels-photo-11559868.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Candi Borobudur", "loc": "Jawa Tengah", "kat": "Budaya", "img": "https://images.pexels.com/photos/2034335/pexels-photo-2034335.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Gunung Bromo", "loc": "Jawa Timur", "kat": "Alam", "img": "https://images.pexels.com/photos/4041131/pexels-photo-4041131.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Danau Toba", "loc": "Sumatera Utara", "kat": "Alam", "img": "https://images.pexels.com/photos/6129991/pexels-photo-6129991.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Tanah Lot", "loc": "Bali", "kat": "Budaya", "img": "https://images.pexels.com/photos/2166559/pexels-photo-2166559.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Wakatobi", "loc": "Sultra", "kat": "Bahari", "img": "https://images.pexels.com/photos/2324562/pexels-photo-2324562.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Pulau Belitung", "loc": "Babel", "kat": "Bahari", "img": "https://images.pexels.com/photos/5406560/pexels-photo-5406560.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Kawah Ijen", "loc": "Jawa Timur", "kat": "Alam", "img": "https://images.pexels.com/photos/14841643/pexels-photo-14841643.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Tana Toraja", "loc": "Sulsel", "kat": "Budaya", "img": "https://images.pexels.com/photos/12470703/pexels-photo-12470703.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Nusa Penida", "loc": "Bali", "kat": "Bahari", "img": "https://images.pexels.com/photos/3322129/pexels-photo-3322129.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Banda Neira", "loc": "Maluku", "kat": "Sejarah", "img": "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Bunaken", "loc": "Sulut", "kat": "Bahari", "img": "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Mandalika", "loc": "NTB", "kat": "Sport", "img": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Likupang", "loc": "Sulut", "kat": "Bahari", "img": "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Derawan", "loc": "Kaltim", "kat": "Bahari", "img": "https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Labuan Bajo", "loc": "NTT", "kat": "Alam", "img": "https://images.pexels.com/photos/16383633/pexels-photo-16383633.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Jakarta Old Town", "loc": "DKI", "kat": "Sejarah", "img": "https://images.pexels.com/photos/11053185/pexels-photo-11053185.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Prambanan", "loc": "DIY", "kat": "Budaya", "img": "https://images.pexels.com/photos/12474921/pexels-photo-12474921.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Garuda Wisnu", "loc": "Bali", "kat": "Budaya", "img": "https://images.pexels.com/photos/931007/pexels-photo-931007.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Pantai Ora", "loc": "Maluku", "kat": "Bahari", "img": "https://images.pexels.com/photos/1287441/pexels-photo-1287441.jpeg?auto=compress&cs=tinysrgb&w=800"},
+    {"nama": "Danau Kelimutu", "loc": "NTT", "kat": "Alam", "img": "https://images.pexels.com/photos/4041131/pexels-photo-4041131.jpeg?auto=compress&cs=tinysrgb&w=800"}
 ]
+df = pd.DataFrame(destinasi)
 
-# ==========================================
-# 4. SIDEBAR NAVIGATION
-# ==========================================
+# 4. SIDEBAR MEWAH
 with st.sidebar:
     st.image("https://upload.wikimedia.org/wikipedia/commons/b/bb/Wonderful_Indonesia_logo.svg", width=180)
-    st.markdown("---")
-    menu = st.radio("Sistem Navigasi:", ["🏢 Beranda Korporat", "🗺️ Katalog Pilihan Premium", "📊 Dashboard Data & Analitik"])
-    st.markdown("---")
-    st.info("Sistem Informasi Pariwisata v2.0 - Final Edition")
+    st.markdown("### **PORTAL EKSEKUTIF**")
+    menu = st.radio("Navigasi:", ["🌟 Home Experience", "🗺️ Katalog Destinasi", "📊 Analitik Data"])
+    st.info(f"Total Destinasi: {len(df)} Lokasi")
 
-# ==========================================
 # 5. LOGIKA HALAMAN
-# ==========================================
-
-# --- HALAMAN 1: BERANDA KORPORAT ---
-if menu == "🏢 Beranda Korporat":
-    col_main_1, col_main_2 = st.columns([2, 1])
+if menu == "🌟 Home Experience":
+    st.title("Eksplorasi Kemurnian Nusantara")
+    st.markdown("#### *Standar Baru dalam Pengalaman Perjalanan Indonesia*")
+    st.image("https://images.pexels.com/photos/1450363/pexels-photo-1450363.jpeg?auto=compress&cs=tinysrgb&w=1600", use_container_width=True)
     
-    with col_main_1:
-        st.title("Wonderful Indonesia Digital Gateway")
-        st.markdown("### *Portal Eksklusif Informasi Destinasi Premium Nusantara*")
-        st.write("Sertifikasi Wonderful Indonesia menjamin standar kualitas tertinggi dalam setiap pengalaman perjalanan Anda di Nusantara. Temukan kemewahan alam dan kekayaan budaya yang autentik.")
-    
-    with col_main_2:
-        st.image("https://source.unsplash.com/600x400/?beach,luxury", use_container_width=True)
-
     st.markdown("---")
     c1, c2, c3 = st.columns(3)
-    c1.metric("Destinasi Premium", "20+", "✓ Certified")
-    c2.metric("Rating Kepuasan Global", "96%", "↑ 1.2%")
-    c3.metric("Kategori Wisata", "5 Utama", "✓ Beragam")
+    with c1:
+        st.markdown('<div class="main-card"><h3>Premium Access</h3><p>Informasi eksklusif 20+ destinasi tersertifikasi.</p></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown('<div class="main-card"><h3>Verified Data</h3><p>Update harga dan fasilitas secara real-time.</p></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown('<div class="main-card"><h3>User Focused</h3><p>Desain antarmuka modern yang memanjakan mata.</p></div>', unsafe_allow_html=True)
 
-# --- HALAMAN 2: KATALOG PREMIUM (DENGAN TABS GAMBAR SEMPURNA) ---
-elif menu == "🗺️ Katalog Pilihan Premium":
-    st.header("Destinasi Unggulan Bersertifikat")
-    st.write("Silakan pilih destinasi di bawah untuk melihat detail, galeri foto, dan informasi biaya.")
+elif menu == "🗺️ Katalog Destinasi":
+    st.header("Katalog Wisata Premium (20+ Destinasi)")
+    st.write("Jelajahi setiap lokasi dengan galeri gambar yang jernih.")
+    
+    # Menampilkan Destinasi dalam 2 Kolom agar Rapi
+    cols = st.columns(2)
+    for i, row in df.iterrows():
+        with cols[i % 2]:
+            st.markdown(f'<div class="main-card">', unsafe_allow_html=True)
+            st.image(row['img'], use_container_width=True)
+            st.subheader(f"📍 {row['nama']}")
+            st.write(f"**Provinsi:** {row['loc']} | **Kategori:** {row['kat']}")
+            
+            # FITUR SLIDE (Simulasi dengan Expand)
+            with st.expander("Lihat Detail & Slide Lainnya"):
+                st.write(f"Nikmati keindahan {row['nama']} yang merupakan salah satu destinasi unggulan di {row['loc']}.")
+                st.image(row['img'], caption=f"Tampilan Utama {row['nama']}", use_container_width=True)
+                if st.button(f"Pesan Tiket {row['nama']}", key=f"btn_{i}"):
+                    st.success(f"Permintaan reservasi ke {row['nama']} berhasil!")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    for item in destinasi_data:
-        # Menggunakan Expander agar rapi, dan menaruh Kategori & Rating di label agar elit
-        expander_title = f"{item['nama']} - {item['provinsi']} ({item['cost']})"
+elif menu == "📊 Analitik Data":
+    st.header("Statistik & Distribusi Wisata")
+    c_a, c_b = st.columns(2)
+    
+    with c_a:
+        st.write("### Porsi Kategori Wisata")
+        fig1 = px.pie(df, names='kat', hole=0.4, color_discrete_sequence=px.colors.sequential.RdBu)
+        st.plotly_chart(fig1, use_container_width=True)
         
-        with st.expander(expander_title):
-            st.markdown(f"**Tagline:** *{item['tagline']}*")
-            st.write(item['desc'])
-            
-            # Sub-kolom di dalam expander
-            col_inner_1, col_inner_2 = st.columns([2, 1])
-            
-            with col_inner_1:
-                st.write("### Galeri Foto (Slide)")
-                # TABS DI DALAM EXPANDER UNTUK SIMULASI SLIDE
-                tab_titles = [f"Foto {i+1}" for i in range(len(item['images']))]
-                tabs = st.tabs(tab_titles)
-                for i, tab in enumerate(tabs):
-                    with tab:
-                        # TAMPILKAN GAMBAR DENGAN FUNGSI UNTUK MEMASTIKAN STABILITAS
-                        try:
-                            # Menambahkan 'try' untuk menangani jika link source unsplash gagal (sangat jarang)
-                            st.markdown(f'<div class="img-container">', unsafe_allow_html=True)
-                            st.image(item['images'][i], use_container_width=True, caption=f"{item['nama']} - Foto {i+1}")
-                            st.markdown('</div>', unsafe_allow_html=True)
-                        except Exception:
-                            st.error("Gagal memuat gambar. Silakan refresh halaman.")
-
-            with col_inner_2:
-                st.write("### Informasi")
-                st.markdown(f"**Kategori:** `{item['kategori']}`")
-                st.markdown(f"**Rating:** `{item['rating']}`")
-                
-                if st.button(f"Cek Reservasi {item['nama']}", key=item['id']):
-                    st.success(f"Permintaan informasi reservasi ke {item['nama']} telah dikirim!")
-
-# --- HALAMAN 3: DASHBOARD DATA ---
-elif menu == "📊 Dashboard Data & Analitik":
-    st.header("Analisis Data Pariwisata Nusantara")
-    
-    # Dataframe Elit
-    df = pd.DataFrame(destinasi_data).drop(columns=['id', 'images', 'desc'])
-    
-    col_db_1, col_db_2 = st.columns([1, 1])
-    
-    with col_db_1:
-        st.write("### Daftar Destinasi Bersertifikat")
+    with c_b:
+        st.write("### Data Table Lengkap")
         st.dataframe(df, use_container_width=True)
-        
-    with col_db_2:
-        st.write("### Distribusi Kategori")
-        fig = px.pie(df, names='kategori', hole=.4, color_discrete_sequence=px.colors.qualitative.Pastel)
-        st.plotly_chart(fig, use_container_width=True)
 
-# ==========================================
-# 6. FOOTER
-# ==========================================
-st.markdown("""
-    <div class="footer">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Wonderful_Indonesia_logo.svg" width="100"><br>
-        © 2026 PT. Pariwisata Nusantara Elit Digital Division. <br>
-        Developed by Nur Annisa. Authorized Wonderful Indonesia Partner.
-    </div>
-    """, unsafe_allow_html=True)
+# FOOTER
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: #64748b;'>© 2026 Wonderful Indonesia Digital Division. Powered by Nur Annisa.</p>", unsafe_allow_html=True)
